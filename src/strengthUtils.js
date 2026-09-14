@@ -1,4 +1,4 @@
-export const calculatePasswordStrength = ({
+export const getPasswordStrength = ({
   length,
   uppercase,
   lowercase,
@@ -7,7 +7,6 @@ export const calculatePasswordStrength = ({
 }) => {
   let score = 0;
 
-  // Password length
   if (length >= 8) {
     score++;
   }
@@ -16,11 +15,6 @@ export const calculatePasswordStrength = ({
     score++;
   }
 
-  if (length >= 16) {
-    score++;
-  }
-
-  // Character types
   if (uppercase) {
     score++;
   }

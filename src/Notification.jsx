@@ -1,6 +1,7 @@
 import { FaCheck } from "react-icons/fa";
+import "./PasswordGenerator.css";
 
-const Notification = ({ message }) => {
+function Notification({ message }) {
   return (
     <div className="copy-notification">
       <div className="notification-icon">
@@ -10,6 +11,6 @@ const Notification = ({ message }) => {
       <span>{message}</span>
     </div>
   );
-};
+}
 
 export default Notification;

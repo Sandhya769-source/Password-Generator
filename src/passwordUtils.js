@@ -7,38 +7,77 @@ export const generatePassword = ({
   numbers,
   symbols,
 }) => {
-  let characters = "";
+  const selectedSets = [];
 
   if (uppercase) {
-    characters += CHARACTER_SETS.uppercase;
+    selectedSets.push(CHARACTER_SETS.uppercase);
   }
 
   if (lowercase) {
-    characters += CHARACTER_SETS.lowercase;
+    selectedSets.push(CHARACTER_SETS.lowercase);
   }
 
   if (numbers) {
-    characters += CHARACTER_SETS.numbers;
+    selectedSets.push(CHARACTER_SETS.numbers);
   }
 
   if (symbols) {
-    characters += CHARACTER_SETS.symbols;
+    selectedSets.push(CHARACTER_SETS.symbols);
   }
 
   // No character type selected
-  if (!characters) {
+  if (selectedSets.length === 0) {
     return "";
   }
 
-  let password = "";
-
-  for (let i = 0; i < length; i++) {
-    const randomIndex = Math.floor(
-      Math.random() * characters.length
-    );
-
-    password += characters[randomIndex];
+  // Password length cannot be smaller than
+  // the number of selected character types.
+  if (length < selectedSets.length) {
+    return "";
   }
 
-  return password;
+  let passwordCharacters = "";
+
+  // Guarantee at least one character
+  // from every selected category.
+  selectedSets.forEach((characterSet) => {
+    const randomIndex = Math.floor(
+      Math.random() * characterSet.length
+    );
+
+    passwordCharacters += characterSet[randomIndex];
+  });
+
+  // Combine all selected character sets.
+  const allCharacters = selectedSets.join("");
+
+  // Fill the remaining password positions.
+  while (passwordCharacters.length < length) {
+    const randomIndex = Math.floor(
+      Math.random() * allCharacters.length
+    );
+
+    passwordCharacters += allCharacters[randomIndex];
+  }
+
+  // Shuffle the password so the guaranteed
+  // characters aren't always at the beginning.
+  return shufflePassword(passwordCharacters);
+};
+
+const shufflePassword = (password) => {
+  const characters = password.split("");
+
+  for (let i = characters.length - 1; i > 0; i--) {
+    const randomIndex = Math.floor(
+      Math.random() * (i + 1)
+    );
+
+    [characters[i], characters[randomIndex]] = [
+      characters[randomIndex],
+      characters[i],
+    ];
+  }
+
+  return characters.join("");
 };
