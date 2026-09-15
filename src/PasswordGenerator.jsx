@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import {
   FaShieldAlt,
@@ -31,6 +32,7 @@ function PasswordGenerator() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(true);
   const [copied, setCopied] = useState(false);
+  const [passwordHistory, setPasswordHistory] = useState([]);
 
   const createPassword = () => {
     const newPassword = generatePassword({
@@ -41,8 +43,22 @@ function PasswordGenerator() {
       symbols,
     });
 
+    if (!newPassword) {
+      setPassword("");
+      return;
+    }
+
     setPassword(newPassword);
     setCopied(false);
+
+    setPasswordHistory((previousHistory) => {
+      return [
+        newPassword,
+        ...previousHistory.filter(
+          (item) => item !== newPassword
+        ),
+      ].slice(0, 5);
+    });
   };
 
   useEffect(() => {
@@ -63,7 +79,29 @@ function PasswordGenerator() {
         setCopied(false);
       }, 2000);
     } catch (error) {
-      console.error("Unable to copy password:", error);
+      console.error(
+        "Unable to copy password:",
+        error
+      );
+    }
+  };
+
+  const copyHistoryPassword = async (historyPassword) => {
+    try {
+      await navigator.clipboard.writeText(
+        historyPassword
+      );
+
+      setCopied(true);
+
+      setTimeout(() => {
+        setCopied(false);
+      }, 2000);
+    } catch (error) {
+      console.error(
+        "Unable to copy password:",
+        error
+      );
     }
   };
 
@@ -71,6 +109,8 @@ function PasswordGenerator() {
 
   return (
     <>
+      {/* Header */}
+
       <div className="header">
         <div className="shield-icon">
           <FaShieldAlt />
@@ -84,6 +124,8 @@ function PasswordGenerator() {
           Create strong and secure passwords in seconds
         </p>
       </div>
+
+      {/* Generator Card */}
 
       <main className="generator-card">
 
@@ -125,6 +167,7 @@ function PasswordGenerator() {
         {/* Character Options */}
 
         <section className="options-grid">
+
           <CharacterOption
             icon="A"
             label="Uppercase Letters (A–Z)"
@@ -160,11 +203,13 @@ function PasswordGenerator() {
               setSymbols(!symbols)
             }
           />
+
         </section>
 
         {/* Password Display */}
 
         <section className="password-section">
+
           <div className="password-box">
 
             <span className="password-text">
@@ -212,6 +257,7 @@ function PasswordGenerator() {
               </button>
 
             </div>
+
           </div>
 
           {/* Password Strength */}
@@ -219,6 +265,7 @@ function PasswordGenerator() {
           <div className="strength-section">
 
             <div className="strength-header">
+
               <span>
                 Password Strength
               </span>
@@ -226,24 +273,28 @@ function PasswordGenerator() {
               <strong>
                 {strength.label}
               </strong>
+
             </div>
 
             <div className="strength-bar">
 
-              {[1, 2, 3, 4, 5].map((item) => (
-                <div
-                  key={item}
-                  className={
-                    item <= strength.level
-                      ? "strength active"
-                      : "strength"
-                  }
-                ></div>
-              ))}
+              {[1, 2, 3, 4, 5].map(
+                (item) => (
+                  <div
+                    key={item}
+                    className={
+                      item <= strength.level
+                        ? "strength active"
+                        : "strength"
+                    }
+                  ></div>
+                )
+              )}
 
             </div>
 
           </div>
+
         </section>
 
         {/* Buttons */}
@@ -277,6 +328,59 @@ function PasswordGenerator() {
 
         </section>
 
+        {/* Password History */}
+
+        {passwordHistory.length > 0 && (
+          <section className="history-section">
+
+            <div className="history-header">
+
+              <h2>Password History</h2>
+
+              <button
+                onClick={() =>
+                  setPasswordHistory([])
+                }
+                className="clear-history"
+              >
+                Clear
+              </button>
+
+            </div>
+
+            <div className="history-list">
+
+              {passwordHistory.map(
+                (historyPassword, index) => (
+                  <div
+                    className="history-item"
+                    key={`${historyPassword}-${index}`}
+                  >
+
+                    <span className="history-password">
+                      {historyPassword}
+                    </span>
+
+                    <button
+                      onClick={() =>
+                        copyHistoryPassword(
+                          historyPassword
+                        )
+                      }
+                      title="Copy password"
+                    >
+                      <FaCopy />
+                    </button>
+
+                  </div>
+                )
+              )}
+
+            </div>
+
+          </section>
+        )}
+
         {/* Features */}
 
         <section className="features">
@@ -308,11 +412,15 @@ function PasswordGenerator() {
       {/* Copy Notification */}
 
       {copied && (
-        <Notification message="Password copied!" />
+        <Notification
+          message="Password copied!"
+        />
       )}
     </>
   );
 }
+
+/* Character Option */
 
 function CharacterOption({
   icon,
@@ -344,6 +452,8 @@ function CharacterOption({
     </div>
   );
 }
+
+/* Feature */
 
 function Feature({ icon, text }) {
   return (
