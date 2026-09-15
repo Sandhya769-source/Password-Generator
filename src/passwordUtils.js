@@ -30,8 +30,8 @@ export const generatePassword = ({
     return "";
   }
 
-  // Password length cannot be smaller than
-  // the number of selected character types.
+  // Password must be long enough
+  // to contain one character from each selected type.
   if (length < selectedSets.length) {
     return "";
   }
@@ -41,11 +41,9 @@ export const generatePassword = ({
   // Guarantee at least one character
   // from every selected category.
   selectedSets.forEach((characterSet) => {
-    const randomIndex = Math.floor(
-      Math.random() * characterSet.length
+    passwordCharacters += getSecureRandomCharacter(
+      characterSet
     );
-
-    passwordCharacters += characterSet[randomIndex];
   });
 
   // Combine all selected character sets.
@@ -53,25 +51,42 @@ export const generatePassword = ({
 
   // Fill the remaining password positions.
   while (passwordCharacters.length < length) {
-    const randomIndex = Math.floor(
-      Math.random() * allCharacters.length
+    passwordCharacters += getSecureRandomCharacter(
+      allCharacters
     );
-
-    passwordCharacters += allCharacters[randomIndex];
   }
 
-  // Shuffle the password so the guaranteed
-  // characters aren't always at the beginning.
+  // Shuffle the password securely.
   return shufflePassword(passwordCharacters);
 };
 
+/*
+ * Returns a cryptographically secure random character.
+ */
+const getSecureRandomCharacter = (characterSet) => {
+  const randomValues = new Uint32Array(1);
+
+  crypto.getRandomValues(randomValues);
+
+  const randomIndex =
+    randomValues[0] % characterSet.length;
+
+  return characterSet[randomIndex];
+};
+
+/*
+ * Securely shuffles the password characters.
+ */
 const shufflePassword = (password) => {
   const characters = password.split("");
 
   for (let i = characters.length - 1; i > 0; i--) {
-    const randomIndex = Math.floor(
-      Math.random() * (i + 1)
-    );
+    const randomValues = new Uint32Array(1);
+
+    crypto.getRandomValues(randomValues);
+
+    const randomIndex =
+      randomValues[0] % (i + 1);
 
     [characters[i], characters[randomIndex]] = [
       characters[randomIndex],
