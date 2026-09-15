@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   FaShieldAlt,
   FaEye,
@@ -30,19 +30,26 @@ function PasswordGenerator() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(true);
   const [copied, setCopied] = useState(false);
+  useEffect(() => {
+    createPassword();
+    }, [length, uppercase, lowercase, numbers, symbols]);
 
-  const createPassword = () => {
-    const newPassword = generatePassword({
-      length,
-      uppercase,
-      lowercase,
-      numbers,
-      symbols,
-    });
+ const createPassword = () => {
+  const newPassword = generatePassword({
+    length,
+    uppercase,
+    lowercase,
+    numbers,
+    symbols,
+  });
 
-    setPassword(newPassword);
-    setCopied(false);
-  };
+  setPassword(newPassword);
+  setCopied(false);
+};
+
+useEffect(() => {
+  createPassword();
+}, [length, uppercase, lowercase, numbers, symbols]);
 
   const copyPassword = async () => {
     if (!password) {
