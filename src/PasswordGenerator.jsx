@@ -34,8 +34,44 @@ function PasswordGenerator() {
 
   const [copied, setCopied] = useState(false);
   const [historyCopied, setHistoryCopied] = useState(false);
+  const [optionWarning, setOptionWarning] = useState(false);
 
   const [passwordHistory, setPasswordHistory] = useState([]);
+
+  /* =========================================
+     Toggle Character Option
+  ========================================= */
+
+  const toggleOption = (option, setter) => {
+    const activeOptions = [
+      uppercase,
+      lowercase,
+      numbers,
+      symbols,
+    ];
+
+    const activeCount = activeOptions.filter(
+      Boolean
+    ).length;
+
+    // Prevent the last active option
+    // from being turned off.
+    if (option && activeCount === 1) {
+      setOptionWarning(true);
+
+      setTimeout(() => {
+        setOptionWarning(false);
+      }, 2000);
+
+      return;
+    }
+
+    setter(!option);
+  };
+
+  /* =========================================
+     Generate Password
+  ========================================= */
 
   const createPassword = () => {
     const newPassword = generatePassword({
@@ -64,6 +100,10 @@ function PasswordGenerator() {
     });
   };
 
+  /* =========================================
+     Automatically Generate Password
+  ========================================= */
+
   useEffect(() => {
     createPassword();
   }, [
@@ -73,6 +113,10 @@ function PasswordGenerator() {
     numbers,
     symbols,
   ]);
+
+  /* =========================================
+     Copy Main Password
+  ========================================= */
 
   const copyPassword = async () => {
     if (!password) {
@@ -95,7 +139,13 @@ function PasswordGenerator() {
     }
   };
 
-  const copyHistoryPassword = async (historyPassword) => {
+  /* =========================================
+     Copy History Password
+  ========================================= */
+
+  const copyHistoryPassword = async (
+    historyPassword
+  ) => {
     try {
       await navigator.clipboard.writeText(
         historyPassword
@@ -118,7 +168,9 @@ function PasswordGenerator() {
 
   return (
     <>
-      {/* Header */}
+      {/* =========================================
+          Header
+      ========================================= */}
 
       <div className="header">
         <div className="shield-icon">
@@ -134,14 +186,19 @@ function PasswordGenerator() {
         </p>
       </div>
 
-      {/* Generator Card */}
+      {/* =========================================
+          Generator Card
+      ========================================= */}
 
       <main className="generator-card">
 
-        {/* Password Length */}
+        {/* =======================================
+            Password Length
+        ======================================= */}
 
         <section className="length-section">
           <div className="section-title-row">
+
             <h2>Password Length</h2>
 
             <div className="length-value">
@@ -151,6 +208,7 @@ function PasswordGenerator() {
             <span className="range-text">
               4 – 32
             </span>
+
           </div>
 
           <input
@@ -159,12 +217,15 @@ function PasswordGenerator() {
             max={PASSWORD_CONFIG.maxLength}
             value={length}
             onChange={(event) =>
-              setLength(Number(event.target.value))
+              setLength(
+                Number(event.target.value)
+              )
             }
             className="range-slider"
             style={{
               "--progress": `${
-                ((length - PASSWORD_CONFIG.minLength) /
+                ((length -
+                  PASSWORD_CONFIG.minLength) /
                   (PASSWORD_CONFIG.maxLength -
                     PASSWORD_CONFIG.minLength)) *
                 100
@@ -173,7 +234,9 @@ function PasswordGenerator() {
           />
         </section>
 
-        {/* Character Options */}
+        {/* =======================================
+            Character Options
+        ======================================= */}
 
         <section className="options-grid">
 
@@ -182,7 +245,10 @@ function PasswordGenerator() {
             label="Uppercase Letters (A–Z)"
             enabled={uppercase}
             onChange={() =>
-              setUppercase(!uppercase)
+              toggleOption(
+                uppercase,
+                setUppercase
+              )
             }
           />
 
@@ -191,7 +257,10 @@ function PasswordGenerator() {
             label="Lowercase Letters (a–z)"
             enabled={lowercase}
             onChange={() =>
-              setLowercase(!lowercase)
+              toggleOption(
+                lowercase,
+                setLowercase
+              )
             }
           />
 
@@ -200,7 +269,10 @@ function PasswordGenerator() {
             label="Numbers (0–9)"
             enabled={numbers}
             onChange={() =>
-              setNumbers(!numbers)
+              toggleOption(
+                numbers,
+                setNumbers
+              )
             }
           />
 
@@ -209,13 +281,18 @@ function PasswordGenerator() {
             label="Special Characters (!@#...)"
             enabled={symbols}
             onChange={() =>
-              setSymbols(!symbols)
+              toggleOption(
+                symbols,
+                setSymbols
+              )
             }
           />
 
         </section>
 
-        {/* Password Display */}
+        {/* =======================================
+            Password Display
+        ======================================= */}
 
         <section className="password-section">
 
@@ -235,7 +312,9 @@ function PasswordGenerator() {
 
               <button
                 onClick={() =>
-                  setShowPassword(!showPassword)
+                  setShowPassword(
+                    !showPassword
+                  )
                 }
                 title={
                   showPassword
@@ -252,7 +331,7 @@ function PasswordGenerator() {
 
               <div className="divider"></div>
 
-              {/* Copy Icon */}
+              {/* Copy */}
 
               <button
                 onClick={copyPassword}
@@ -269,11 +348,14 @@ function PasswordGenerator() {
 
           </div>
 
-          {/* Password Strength */}
+          {/* =====================================
+              Password Strength
+          ===================================== */}
 
           <div className="strength-section">
 
             <div className="strength-header">
+
               <span>
                 Password Strength
               </span>
@@ -281,6 +363,7 @@ function PasswordGenerator() {
               <strong>
                 {strength.label}
               </strong>
+
             </div>
 
             <div className="strength-bar">
@@ -301,9 +384,12 @@ function PasswordGenerator() {
             </div>
 
           </div>
+
         </section>
 
-        {/* Buttons */}
+        {/* =======================================
+            Buttons
+        ======================================= */}
 
         <section className="button-section">
 
@@ -312,6 +398,7 @@ function PasswordGenerator() {
             onClick={createPassword}
           >
             <FaSyncAlt />
+
             Generate Password
           </button>
 
@@ -334,7 +421,9 @@ function PasswordGenerator() {
 
         </section>
 
-        {/* Password History */}
+        {/* =======================================
+            Password History
+        ======================================= */}
 
         {passwordHistory.length > 0 && (
           <section className="history-section">
@@ -387,7 +476,9 @@ function PasswordGenerator() {
           </section>
         )}
 
-        {/* Features */}
+        {/* =======================================
+            Features
+        ======================================= */}
 
         <section className="features">
 
@@ -415,7 +506,9 @@ function PasswordGenerator() {
 
       </main>
 
-      {/* Copy Notifications */}
+      {/* =========================================
+          Notifications
+      ========================================= */}
 
       {copied && (
         <Notification
@@ -428,11 +521,20 @@ function PasswordGenerator() {
           message="Password copied from history!"
         />
       )}
+
+      {optionWarning && (
+        <Notification
+          message="Keep at least one character option enabled!"
+        />
+      )}
     </>
   );
 }
 
-/* Character Option */
+
+/* =============================================
+   Character Option Component
+============================================= */
 
 function CharacterOption({
   icon,
@@ -465,16 +567,21 @@ function CharacterOption({
   );
 }
 
-/* Feature */
+
+/* =============================================
+   Feature Component
+============================================= */
 
 function Feature({ icon, text }) {
   return (
     <div className="feature">
       {icon}
-      <span>{text}</span>
+
+      <span>
+        {text}
+      </span>
     </div>
   );
 }
 
 export default PasswordGenerator;
-
