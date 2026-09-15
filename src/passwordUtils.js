@@ -56,7 +56,7 @@ export const generatePassword = ({
     );
   }
 
-  // Shuffle the password securely.
+  // Securely shuffle the password.
   return shufflePassword(passwordCharacters);
 };
 
@@ -96,3 +96,4 @@ const shufflePassword = (password) => {
 
   return characters.join("");
 };
+

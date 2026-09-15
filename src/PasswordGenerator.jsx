@@ -1,5 +1,5 @@
-
 import { useEffect, useState } from "react";
+
 import {
   FaShieldAlt,
   FaEye,
@@ -31,7 +31,10 @@ function PasswordGenerator() {
 
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(true);
+
   const [copied, setCopied] = useState(false);
+  const [historyCopied, setHistoryCopied] = useState(false);
+
   const [passwordHistory, setPasswordHistory] = useState([]);
 
   const createPassword = () => {
@@ -63,7 +66,13 @@ function PasswordGenerator() {
 
   useEffect(() => {
     createPassword();
-  }, [length, uppercase, lowercase, numbers, symbols]);
+  }, [
+    length,
+    uppercase,
+    lowercase,
+    numbers,
+    symbols,
+  ]);
 
   const copyPassword = async () => {
     if (!password) {
@@ -92,10 +101,10 @@ function PasswordGenerator() {
         historyPassword
       );
 
-      setCopied(true);
+      setHistoryCopied(true);
 
       setTimeout(() => {
-        setCopied(false);
+        setHistoryCopied(false);
       }, 2000);
     } catch (error) {
       console.error(
@@ -265,7 +274,6 @@ function PasswordGenerator() {
           <div className="strength-section">
 
             <div className="strength-header">
-
               <span>
                 Password Strength
               </span>
@@ -273,7 +281,6 @@ function PasswordGenerator() {
               <strong>
                 {strength.label}
               </strong>
-
             </div>
 
             <div className="strength-bar">
@@ -294,7 +301,6 @@ function PasswordGenerator() {
             </div>
 
           </div>
-
         </section>
 
         {/* Buttons */}
@@ -409,11 +415,17 @@ function PasswordGenerator() {
 
       </main>
 
-      {/* Copy Notification */}
+      {/* Copy Notifications */}
 
       {copied && (
         <Notification
           message="Password copied!"
+        />
+      )}
+
+      {historyCopied && (
+        <Notification
+          message="Password copied from history!"
         />
       )}
     </>
@@ -465,3 +477,4 @@ function Feature({ icon, text }) {
 }
 
 export default PasswordGenerator;
+
