@@ -4,6 +4,7 @@ import {
   FaEye,
   FaEyeSlash,
   FaCopy,
+  FaCheck,
   FaSyncAlt,
   FaBolt,
   FaStar,
@@ -30,26 +31,23 @@ function PasswordGenerator() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(true);
   const [copied, setCopied] = useState(false);
+
+  const createPassword = () => {
+    const newPassword = generatePassword({
+      length,
+      uppercase,
+      lowercase,
+      numbers,
+      symbols,
+    });
+
+    setPassword(newPassword);
+    setCopied(false);
+  };
+
   useEffect(() => {
     createPassword();
-    }, [length, uppercase, lowercase, numbers, symbols]);
-
- const createPassword = () => {
-  const newPassword = generatePassword({
-    length,
-    uppercase,
-    lowercase,
-    numbers,
-    symbols,
-  });
-
-  setPassword(newPassword);
-  setCopied(false);
-};
-
-useEffect(() => {
-  createPassword();
-}, [length, uppercase, lowercase, numbers, symbols]);
+  }, [length, uppercase, lowercase, numbers, symbols]);
 
   const copyPassword = async () => {
     if (!password) {
@@ -69,13 +67,7 @@ useEffect(() => {
     }
   };
 
-  const strength = getPasswordStrength({
-    length,
-    uppercase,
-    lowercase,
-    numbers,
-    symbols,
-  });
+  const strength = getPasswordStrength(password);
 
   return (
     <>
@@ -98,9 +90,7 @@ useEffect(() => {
         {/* Password Length */}
 
         <section className="length-section">
-
           <div className="section-title-row">
-
             <h2>Password Length</h2>
 
             <div className="length-value">
@@ -110,33 +100,31 @@ useEffect(() => {
             <span className="range-text">
               4 – 32
             </span>
-
           </div>
 
-         <input
+          <input
             type="range"
             min={PASSWORD_CONFIG.minLength}
             max={PASSWORD_CONFIG.maxLength}
             value={length}
             onChange={(event) =>
-                setLength(Number(event.target.value))
+              setLength(Number(event.target.value))
             }
             className="range-slider"
             style={{
-                "--progress": `${
+              "--progress": `${
                 ((length - PASSWORD_CONFIG.minLength) /
-                    (PASSWORD_CONFIG.maxLength -
+                  (PASSWORD_CONFIG.maxLength -
                     PASSWORD_CONFIG.minLength)) *
                 100
-                }%`,
+              }%`,
             }}
-            />
+          />
         </section>
 
         {/* Character Options */}
 
         <section className="options-grid">
-
           <CharacterOption
             icon="A"
             label="Uppercase Letters (A–Z)"
@@ -172,13 +160,11 @@ useEffect(() => {
               setSymbols(!symbols)
             }
           />
-
         </section>
 
         {/* Password Display */}
 
         <section className="password-section">
-
           <div className="password-box">
 
             <span className="password-text">
@@ -186,10 +172,12 @@ useEffect(() => {
                 ? showPassword
                   ? password
                   : "•".repeat(password.length)
-                : "Click Generate Password"}
+                : "Select at least one option"}
             </span>
 
             <div className="password-actions">
+
+              {/* Show / Hide */}
 
               <button
                 onClick={() =>
@@ -210,23 +198,27 @@ useEffect(() => {
 
               <div className="divider"></div>
 
+              {/* Copy Icon */}
+
               <button
                 onClick={copyPassword}
                 title="Copy password"
               >
-                <FaCopy />
+                {copied ? (
+                  <FaCheck />
+                ) : (
+                  <FaCopy />
+                )}
               </button>
 
             </div>
-
           </div>
 
-          {/* Strength */}
+          {/* Password Strength */}
 
           <div className="strength-section">
 
             <div className="strength-header">
-
               <span>
                 Password Strength
               </span>
@@ -234,7 +226,6 @@ useEffect(() => {
               <strong>
                 {strength.label}
               </strong>
-
             </div>
 
             <div className="strength-bar">
@@ -253,7 +244,6 @@ useEffect(() => {
             </div>
 
           </div>
-
         </section>
 
         {/* Buttons */}
@@ -269,11 +259,20 @@ useEffect(() => {
           </button>
 
           <button
-            className="copy-btn"
+            className={`copy-btn ${
+              copied ? "copied" : ""
+            }`}
             onClick={copyPassword}
           >
-            <FaCopy />
-            Copy Password
+            {copied ? (
+              <FaCheck />
+            ) : (
+              <FaCopy />
+            )}
+
+            {copied
+              ? "Copied!"
+              : "Copy Password"}
           </button>
 
         </section>
@@ -305,6 +304,8 @@ useEffect(() => {
         </section>
 
       </main>
+
+      {/* Copy Notification */}
 
       {copied && (
         <Notification message="Password copied!" />
